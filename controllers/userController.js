@@ -10,7 +10,8 @@ exports.registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists)
       return res.status(400).json({ message: "User already exists" });
-    const user = await User.create({
+
+    const newUser = new User({
       username,
       email,
       password,
@@ -19,8 +20,21 @@ exports.registerUser = async (req, res) => {
       dob,
       country,
     });
-    res.status(201).json({ message: "User registered successfully!", user });
+
+    //Validate the user
+    await newUser.validate();
+
+    //Save into DB
+    await newUser.save();
+
+    res.status(201).json({ message: "User registered successfully!", newUser });
   } catch (error) {
+    console.log(error);
+
+    // Handle validation errors specifically
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
     res.status(500).json({ message: "Server Error" });
   }
 };
