@@ -67,9 +67,12 @@ exports.loginUser = async (req, res) => {
 exports.searchUser = async (req, res) => {
   try {
     const { query } = req.query;
+
+    //Find user using query params
     const user = await User.findOne({
       $or: [{ username: query }, { email: query }],
     }).select("-password");
+
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (error) {
