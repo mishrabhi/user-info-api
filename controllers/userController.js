@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
+const bcrypt = require("bcryptjs");
 
 //register user
 exports.registerUser = async (req, res) => {
@@ -35,6 +36,28 @@ exports.registerUser = async (req, res) => {
     if (error.name === "ValidationError") {
       return res.status(400).json({ message: error.message });
     }
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+//User Login
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    //Find user
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(400).json({ message: "Invalid email or password" });
+
+    //Match password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid email or password" });
+
+    //Generate token
+    res.json({ token: generateToken(user._id) });
+  } catch (error) {
     res.status(500).json({ message: "Server Error" });
   }
 };
