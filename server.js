@@ -13,6 +13,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const PORT = process.env.PORT || 5000;
+
 //Routes
 app.get("/", (req, res) => {
   res.send("Server is running...");
@@ -21,6 +23,6 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRoutes);
 
 //Start the server
-app.listen(8080, () => {
-  console.log("Server up and running");
+app.listen(PORT, () => {
+  console.log(`Server up and running on port: ${PORT}`);
 });
